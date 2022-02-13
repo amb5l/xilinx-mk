@@ -30,6 +30,43 @@ proc attempt {cmd} {
     }
 }
 
+proc params_to_dict {p} {    
+    set d [dict create]
+    while (1) {
+        while (1) {
+            set key [lindex $p 0]
+            set c [string index $key end]
+            if {$c == ""} {
+                break
+            }
+            set p [lrange $p 1 end]
+            if {$c == ":"} {
+                set key [string range $key 0 end-1]
+                break
+            }
+        }
+        if {$key == ""} {
+            break
+        }
+        set values []
+        while (1) {
+            set c [string index [lindex $p 0] end]
+            if {$c == "" || $c == ":"} {
+                break
+            } else {
+                lappend values [lindex $p 0]
+                set p [lrange $p 1 end]
+            }
+        }
+        if {[llength $values] > 0} {
+            foreach value $values {
+                dict lappend d $key $value
+            }
+        }
+    }
+    return $d
+}
+
 set args $argv
 set proj_dir [lindex $args 0]
 set proj_name [lindex $args 1]
@@ -42,39 +79,7 @@ switch $cmd {
         set proj_lang [lindex $args 0]
         set fpga_part [lindex $args 1]
         set args [lrange $args 2 end]
-        set d [dict create]
-        while (1) {
-            while (1) {
-                set key [lindex $args 0]
-                set c [string index $key end]
-                if {$c == ""} {
-                    break
-                }
-                set args [lrange $args 1 end]
-                if {$c == ":"} {
-                    set key [string range $key 0 end-1]
-                    break
-                }
-            }
-            if {$key == ""} {
-                break
-            }
-            set values []
-            while (1) {
-                set c [string index [lindex $args 0] end]
-                if {$c == "" || $c == ":"} {
-                    break
-                } else {
-                    lappend values [lindex $args 0]
-                    set args [lrange $args 1 end]
-                }
-            }
-            if {[llength $values] > 0} {
-                foreach value $values {
-                    dict lappend d $key $value
-                }
-            }
-        }
+        set d [params_to_dict $args]
         file mkdir $proj_dir
         cd ./$proj_dir
         attempt "create_project -part $fpga_part -force $proj_name"
@@ -227,17 +232,25 @@ switch $cmd {
     }
 
     simulate {
-        # simulate [proc_inst proc_ref proc_elf]
+        # simulate [generics: generic value] [elf: proc_inst proc_ref proc_elf]
+        set d [params_to_dict $args]
         cd ./$proj_dir
         open_project $proj_name
-        if {[llength $args] >= 2} {
-            set proc_inst [lindex $args 1]
+        if {[dict exist $d generics]} {
+            set g [dict get $d generics]
+            set s "set_property generic {"
+            while {[llength $g] >= 2} {
+                append s "[lindex $g 0]=[lindex $g 1] "
+                set g [lrange $g 2 end]
+            }
+            append s "} \[get_filesets sim_1\]"
+            puts $s
+            attempt $s
         }
-        if {[llength $args] >= 3} {
-            set proc_ref [lindex $args 2]
-        }
-        if {[llength $args] >= 4} {
-            set proc_elf [lindex $args 3]
+        if {[dict exist $d elf]} {
+            set proc_inst [lindex [dict get $d elf] 0]
+            set proc_ref [lindex [dict get $d elf] 1]
+            set proc_elf [lindex [dict get $d elf] 2]
             if {[llength [get_files -all -of_objects [get_fileset sim_1] $proc_elf]] == 0} {
                 add_files -norecurse -fileset \[get_filesets sim_1\] $proc_elf
                 set_property SCOPED_TO_REF $proc_ref [get_files -all -of_objects [get_fileset sim_1] $proc_elf]

@@ -22,12 +22,15 @@
 #
 # To include simulation support, define the following...
 #	VIVADO_SIM_TOP			top entity name for simulation
+#	VIVADO_SIM_OUT			simulation output file
 # ...and one or more of the following...
 #	VIVADO_SIM_VHDL			simulation sources - VHDL (.vhd)
 #	VIVADO_SIM_VHDL_2008	simulation sources - VHDL-2008 (.vhd)
 # ...and optionally one or more of the following...
+#	VIVADO_SIM_IN			simulation input (stimulus) file(s)
 #	VIVADO_SIM_IP_VHDL		IP simulation models (.vhd)
 #	VIVADO_SIM_ELF_CFG		build configuration for processor ELF file for simulation
+#	VIVADO_SIM_GENERICS		name value pairs
 #
 # If the design includes a CPU in an IP integrator block diagram,
 # the following should be defined...
@@ -73,8 +76,10 @@ VIVADO_BD_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).srcs/sources_1/bd
 VIVADO_BD_HWDEF_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).gen/sources_1/bd
 VIVADO_SIM_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).sim/sim_1/behav/xsim
 VIVADO_SIM_IP_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).gen/sources_1/ip
+ifdef VITIS_APP
 VIVADO_DSN_ELF=$(VITIS_DIR)/$(VITIS_APP)/$(VIVADO_DSN_ELF_CFG)/$(VITIS_APP).elf
 VIVADO_SIM_ELF=$(VITIS_DIR)/$(VITIS_APP)/$(VIVADO_SIM_ELF_CFG)/$(VITIS_APP).elf
+endif
 
 # related file lists
 VIVADO_DSN_IP_XCI=$(foreach X,$(basename $(notdir $(VIVADO_DSN_IP_TCL))),$(VIVADO_DSN_IP_PATH)/$X/$X.xci)
@@ -149,7 +154,11 @@ $(VIVADO_BIT_FILE): $(VIVADO_IMPL_FILE)
 
 # implementation file depends on synthesis file, ELF file, and relevant constraints (and existence of project)
 $(VIVADO_IMPL_FILE): $(VIVADO_SYNTH_FILE) $(VIVADO_DSN_ELF) $(VIVADO_DSN_XDC_IMPL) $(VIVADO_DSN_XDC) | $(VIVADO_PROJ_FILE)
+ifdef VITIS_APP
 	$(VIVADO_MK) build impl $(VIVADO_JOBS) $(VIVADO_DSN_PROC_INST) $(VIVADO_DSN_PROC_REF) ../$(VIVADO_DSN_ELF)
+else
+	$(VIVADO_MK) build impl $(VIVADO_JOBS)
+endif
 
 # synthesis file depends design sources and relevant constraints (and existence of project)
 $(VIVADO_SYNTH_FILE): $(VIVADO_DSN_IP_XCI) $(VIVADO_DSN_BD_HWDEF) $(VIVADO_DSN_VHDL) $(VIVADO_DSN_VHDL_2008) $(VIVADO_DSN_XDC_SYNTH) $(VIVADO_DSN_XDC) | $(VIVADO_PROJ_FILE)
@@ -187,9 +196,16 @@ $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_TCL,$(X:.tcl=_update
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_SVG,$(X:.tcl=_updated.svg),$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
 
 # run simulation
-sim: $(VIVADO_SIM_PATH)/$(VIVADO_SIM_FILE)
-$(VIVADO_SIM_PATH)/$(VIVADO_SIM_FILE): $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008) $(VIVADO_SIM_IP_FILES) | $(VIVADO_PROJ_FILE)
-	$(VIVADO_MK) simulate ../$(VIVADO_SIM_ELF) $(VIVADO_DSN_PROC_INST) $(VIVADO_DSN_PROC_REF) $(VIVADO_SIM_ELF)
+sim: $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT)
+$(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT): $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008) $(VIVADO_SIM_IP_FILES) $(VIVADO_SIM_IN) | $(VIVADO_PROJ_FILE)
+ifdef VITIS_APP
+	$(VIVADO_MK) simulate \
+		elf:      $(VIVADO_DSN_PROC_INST) $(VIVADO_DSN_PROC_REF) ../$(VIVADO_SIM_ELF) \
+		generics: $(VIVADO_SIM_GENERICS)
+else
+	$(VIVADO_MK) simulate \
+		generics: $(VIVADO_SIM_GENERICS)
+endif
 
 ################################################################################
 # Vitis rules and recipes
@@ -222,4 +238,6 @@ endif
 .PHONY: clean
 clean:
 	rm -r $(VIVADO_DIR)
+ifdef VITIS_APP
 	rm -r $(VITIS_DIR)
+endif
