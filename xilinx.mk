@@ -129,9 +129,6 @@ endif
 ifndef FPGA_PART
 $(error FPGA_PART is not set)
 endif
-ifndef VIVADO_DSN_TOP
-$(error VIVADO_DSN_TOP is not set)
-endif
 
 ################################################################################
 
