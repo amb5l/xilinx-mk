@@ -2,7 +2,7 @@
 ## vivado_mk.tcl                                                              ##
 ## Helper script for using makefiles with Xilinx Vivado.                      ##
 ################################################################################
-## (C) Copyright 2021 Adam Barnes <ambarnes@gmail.com>                        ##
+## (C) Copyright 2022 Adam Barnes <ambarnes@gmail.com>                        ##
 ## This file is part of xilinx-mk. xilinx-mk is free software: you can        ##
 ## redistribute it and/or modify it under the terms of the GNU Lesser General ##
 ## Public License as published by the Free Software Foundation, either        ##
@@ -176,6 +176,7 @@ switch $cmd {
             synth {
                 # build synth jobs
                 set jobs [lindex $args 1]
+                attempt "reset_run synth_1"
                 attempt "launch_runs synth_1 -jobs $jobs"
                 attempt "wait_on_run synth_1"
                 if {[get_property PROGRESS [get_runs synth_1]] != "100%"} {
@@ -199,6 +200,7 @@ switch $cmd {
                         attempt "set_property SCOPED_TO_CELLS $proc_inst \[get_files -of_objects \[get_filesets sources_1\] $proc_elf\]"
                     }
                 }
+                attempt "reset_run impl_1"
                 attempt "launch_runs impl_1 -jobs $jobs"
                 attempt "wait_on_run impl_1"
                 if {[get_property PROGRESS [get_runs synth_1]] != "100%"} {

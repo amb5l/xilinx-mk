@@ -2,7 +2,7 @@
 ## vitis_mk.tcl                                                               ##
 ## Helper script for using makefiles with Xilinx Vitis.                       ##
 ################################################################################
-## (C) Copyright 2021 Adam Barnes <ambarnes@gmail.com>                        ##
+## (C) Copyright 2022 Adam Barnes <ambarnes@gmail.com>                        ##
 ## This file is part of xilinx-mk. xilinx-mk is free software: you can        ##
 ## redistribute it and/or modify it under the terms of the GNU Lesser General ##
 ## Public License as published by the Free Software Foundation, either        ##
