@@ -67,7 +67,7 @@ VIVADO_JOBS=4
 VIVADO_DIR=vivado
 VIVADO_MK=vivado -mode tcl -notrace -nolog -nojournal -source $(XILINX_MK)/vivado_mk.tcl -tclargs $(VIVADO_DIR) $(VIVADO_PROJ)
 VIVADO_PROJ_FILE=$(VIVADO_DIR)/$(VIVADO_PROJ).xpr
-VIVADO_BIT_FILE=$(VIVADO_DIR)/$(VIVADO_DSN_TOP).bit
+VIVADO_BIT_FILE=$(VIVADO_DSN_TOP).bit
 VIVADO_IMPL_FILE=$(VIVADO_DIR)/$(VIVADO_PROJ).runs/impl_1/$(VIVADO_DSN_TOP)_routed.dcp
 VIVADO_SYNTH_FILE=$(VIVADO_DIR)/$(VIVADO_PROJ).runs/synth_1/$(VIVADO_DSN_TOP).dcp
 VIVADO_XSA_FILE=$(VIVADO_DIR)/$(VIVADO_DSN_TOP).xsa
@@ -100,7 +100,7 @@ endef
 
 # build BD hardware definitions from BD files
 define RR_VIVADO_BD_HWDEF
-$(1): $(2) | $(VIVADO_PROJ_FILE)
+$(1): | $(2) $(VIVADO_PROJ_FILE)
 	$(VIVADO_MK) build hwdef ../$(2)
 endef
 
@@ -171,7 +171,7 @@ $(foreach X,$(VIVADO_DSN_IP_TCL),$(eval $(call RR_VIVADO_IP_XCI,$(VIVADO_DSN_IP_
 $(VIVADO_XSA_FILE): $(VIVADO_DSN_BD_HWDEF) | $(VIVADO_PROJ_FILE)
 	$(VIVADO_MK) build xsa
 
-# BD hardware definitions depend on BD files (and existence of project)
+# BD hardware definitions depend on existence of BD files and project
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_HWDEF,$(VIVADO_BD_HWDEF_PATH)/$(basename $(notdir $X))/synth/$(basename $(notdir $X)).hwdef,$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
 
 # BD files depend on BD TCL scripts (and existence of project)
@@ -215,9 +215,9 @@ ifdef VITIS_APP
 # ELF files depend on XSA file and source (and existence of project)
 elf: $(VITIS_ELF_RELEASE) $(VITIS_ELF_DEBUG)
 $(VITIS_ELF_RELEASE) : $(VIVADO_XSA_FILE) $(VITIS_SRC) $(VITIS_SRC_RELEASE) | $(VITIS_PROJ_FILE)
-	$(VITIS_MK) build release $(VITIS_APP)
+	$(VITIS_MK) build release
 $(VITIS_ELF_DEBUG) : $(VIVADO_XSA_FILE) $(VITIS_SRC) $(VITIS_SRC_DEBUG) | $(VITIS_PROJ_FILE)
-	$(VITIS_MK) build debug $(VITIS_APP)
+	$(VITIS_MK) build debug
 
 # Vitis project depends on makefile (and existence of XSA file)
 $(VITIS_PROJ_FILE): makefile | $(VIVADO_XSA_FILE)
@@ -237,7 +237,5 @@ endif
 
 .PHONY: clean
 clean:
-	rm -r $(VIVADO_DIR)
-ifdef VITIS_APP
-	rm -r $(VITIS_DIR)
-endif
+	rm -rf $(VIVADO_DIR)
+	rm -rf $(VITIS_DIR)

@@ -30,7 +30,7 @@ proc attempt {cmd} {
     }
 }
 
-proc params_to_dict {p} {    
+proc params_to_dict {p} {
     set d [dict create]
     while (1) {
         while (1) {
@@ -229,6 +229,18 @@ switch $cmd {
                 error_exit {"build - unknown target ($target)"}
             }
         }
+    }
+
+    prog {
+        # prog file
+        set file [lindex $args 0]
+        open_hw
+        connect_hw_server
+        current_hw_target [lindex [get_hw_targets] 0]
+        open_hw_target
+        current_hw_device [lindex [get_hw_devices] 0]
+        set_property PROGRAM.FILE $file [current_hw_device]
+        program_hw_devices [current_hw_device]
     }
 
     simulate {
