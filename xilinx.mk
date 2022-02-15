@@ -235,7 +235,7 @@ endif
 ################################################################################
 # clean up
 
-clean:
+clean::
 	rm -rf $(VIVADO_DIR)
 	rm -rf $(VITIS_DIR)
 	rm -f transcript
