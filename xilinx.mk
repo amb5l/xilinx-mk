@@ -13,9 +13,9 @@
 #	VIVADO_DSN_IP_TCL		IP core creation TCL scripts (.tcl)
 #	VIVADO_DSN_BD_TCL		block diagram creation TCL scripts (.tcl)
 # ...and optionally one of more of the following...
-#	VIVADO_DSN_XDC			design constraints (.xdc) (synthesis and implementation)
-#	VIVADO_DSN_XDC_SYNTH	design constraints (.xdc) (synthesis only)
-#	VIVADO_DSN_XDC_IMPL		design constraints (.xdc) (implementation only)
+#	VIVADO_DSN_XDC			design constraints (.xdc/.tcl) (synthesis and implementation)
+#	VIVADO_DSN_XDC_SYNTH	design constraints (.xdc/.tcl) (synthesis only)
+#	VIVADO_DSN_XDC_IMPL		design constraints (.xdc/.tcl) (implementation only)
 #	VIVADO_DSN_PROC_INST	processor instance name
 #	VIVADO_DSN_PROC_REF		processor module reference (block diagram name)
 #	VIVADO_DSN_ELF_CFG		build configuration for processor ELF file for implementation
