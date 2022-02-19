@@ -117,6 +117,17 @@ switch $cmd {
             attempt "set_property top [lindex [dict get $d dsn_top] 0] \[get_filesets sources_1\]"
             set d [dict remove $d dsn_top]
         }
+        if {[dict exist $d dsn_gen]} {
+            set g [dict get $d dsn_gen]
+            set s "set_property generic {"
+            while {[llength $g] >= 2} {
+                append s "[lindex $g 0]=[lindex $g 1] "
+                set g [lrange $g 2 end]
+            }
+            append s "} \[get_filesets sources_1\]"
+            attempt $s
+            set d [dict remove $d dsn_gen]
+        }        
         if {[dict exist $d sim_vhdl]} {
             attempt "add_files -norecurse -fileset \[get_filesets sim_1\] [dict get $d sim_vhdl]"
             set d [dict remove $d sim_vhdl]
@@ -130,8 +141,19 @@ switch $cmd {
             attempt "set_property top [lindex [dict get $d sim_top] 0] \[get_filesets sim_1\]"
             set d [dict remove $d sim_top]
         }
+        if {[dict exist $d sim_gen]} {
+            set g [dict get $d sim_gen]
+            set s "set_property generic {"
+            while {[llength $g] >= 2} {
+                append s "[lindex $g 0]=[lindex $g 1] "
+                set g [lrange $g 2 end]
+            }
+            append s "} \[get_filesets sim_1\]"
+            attempt $s
+            set d [dict remove $d sim_gen]
+        }                
         if {[llength [dict keys $d]]} {
-            error_exit {"create - leftovers: $d"}
+            error_exit "create - leftovers: $d"
         }
     }
 
@@ -246,19 +268,18 @@ switch $cmd {
     }
 
     simulate {
-        # simulate [generics: generic value] [elf: proc_inst proc_ref proc_elf]
+        # simulate [gen: generic value] [elf: proc_inst proc_ref proc_elf]
         set d [params_to_dict $args]
         cd ./$proj_dir
         open_project $proj_name
-        if {[dict exist $d generics]} {
-            set g [dict get $d generics]
+        if {[dict exist $d gen]} {
+            set g [dict get $d gen]
             set s "set_property generic {"
             while {[llength $g] >= 2} {
                 append s "[lindex $g 0]=[lindex $g 1] "
                 set g [lrange $g 2 end]
             }
             append s "} \[get_filesets sim_1\]"
-            puts $s
             attempt $s
         }
         if {[dict exist $d elf]} {

@@ -186,9 +186,11 @@ $(VIVADO_PROJ_FILE): makefile | $(VIVADO_DSN_IP_TCL) $(VIVADO_DSN_BD_TCL) $(VIVA
 		dsn_xdc_synth:  $(VIVADO_DSN_XDC_SYNTH) \
 		dsn_xdc_impl:   $(VIVADO_DSN_XDC_IMPL) \
 		dsn_top:        $(VIVADO_DSN_TOP) \
+		dsn_gen:        $(VIVADO_DSN_GENERICS) \
 		sim_vhdl:       $(VIVADO_SIM_VHDL) \
 		sim_vhdl_2008:  $(VIVADO_SIM_VHDL_2008) \
-		sim_top:        $(VIVADO_SIM_TOP)
+		sim_top:        $(VIVADO_SIM_TOP) \
+		sim_gen:        $(VIVADO_SIM_GENERICS)
 
 # update BD source TCL scripts and SVG files from changed BD files
 update_bd: $(VIVADO_UPD_BD_TCL) $(VIVADO_UPD_BD_SVG)
@@ -200,11 +202,11 @@ sim: $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT)
 $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT): $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008) $(VIVADO_SIM_IP_FILES) $(VIVADO_SIM_IN) | $(VIVADO_PROJ_FILE)
 ifdef VITIS_APP
 	$(VIVADO_MK) simulate \
-		elf:      $(VIVADO_DSN_PROC_INST) $(VIVADO_DSN_PROC_REF) ../$(VIVADO_SIM_ELF) \
-		generics: $(VIVADO_SIM_GENERICS)
+		elf: $(VIVADO_DSN_PROC_INST) $(VIVADO_DSN_PROC_REF) ../$(VIVADO_SIM_ELF) \
+		gen: $(VIVADO_SIM_GENERICS)
 else
 	$(VIVADO_MK) simulate \
-		generics: $(VIVADO_SIM_GENERICS)
+		gen: $(VIVADO_SIM_GENERICS)
 endif
 
 ################################################################################
