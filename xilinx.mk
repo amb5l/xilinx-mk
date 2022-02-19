@@ -5,7 +5,7 @@
 #	XILINX_MK				path to vivado_mk.tcl and vitis_mk.tcl
 #	VIVADO_PROJ				Vivado project name
 #	VIVADO_LANG				Vivado project language (VHDL or Verilog)
-#	FPGA_PART				FPGA part number
+#	VIVADO_PART				FPGA part number
 #	VIVADO_DSN_TOP			top entity name for synthesis and implementation
 # ...one or more of the following...
 #	VIVADO_DSN_VHDL			design sources - VHDL (.vhd)
@@ -131,8 +131,8 @@ endif
 ifndef VIVADO_LANG
 $(error VIVADO_LANG is not set)
 endif
-ifndef FPGA_PART
-$(error FPGA_PART is not set)
+ifndef VIVADO_PART
+$(error VIVADO_PART is not set)
 endif
 
 ################################################################################
@@ -179,7 +179,7 @@ $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD,$(VIVADO_BD_PATH)/$(
 
 # Vivado project file depends on makefile, and existence of all design and simulation sources
 $(VIVADO_PROJ_FILE): makefile | $(VIVADO_DSN_IP_TCL) $(VIVADO_DSN_BD_TCL) $(VIVADO_DSN_VHDL) $(VIVADO_DSN_VHDL_2008) $(VIVADO_DSN_XDC) $(VIVADO_DSN_XDC_SYNTH) $(VIVADO_DSN_XDC_IMPL) $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008)
-	$(VIVADO_MK) create $(VIVADO_LANG) $(FPGA_PART) \
+	$(VIVADO_MK) create $(VIVADO_LANG) $(VIVADO_PART) \
 		dsn_vhdl:       $(VIVADO_DSN_VHDL) \
 		dsn_vhdl_2008:  $(VIVADO_DSN_VHDL_2008) \
 		dsn_xdc:        $(VIVADO_DSN_XDC) \
