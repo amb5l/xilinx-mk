@@ -179,6 +179,7 @@ $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD,$(VIVADO_BD_PATH)/$(
 
 # Vivado project file depends on makefile, and existence of all design and simulation sources
 $(VIVADO_PROJ_FILE): makefile | $(VIVADO_DSN_IP_TCL) $(VIVADO_DSN_BD_TCL) $(VIVADO_DSN_VHDL) $(VIVADO_DSN_VHDL_2008) $(VIVADO_DSN_XDC) $(VIVADO_DSN_XDC_SYNTH) $(VIVADO_DSN_XDC_IMPL) $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008)
+	rm -rf $(VIVADO_DIR)
 	$(VIVADO_MK) create $(VIVADO_LANG) $(VIVADO_PART) \
 		dsn_vhdl:       $(VIVADO_DSN_VHDL) \
 		dsn_vhdl_2008:  $(VIVADO_DSN_VHDL_2008) \
