@@ -238,6 +238,7 @@ endif
 # clean up
 
 clean::
+	rm -rf .Xil
 	rm -rf $(VIVADO_DIR)
 	rm -rf $(VITIS_DIR)
 	rm -f transcript
