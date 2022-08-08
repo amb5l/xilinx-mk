@@ -287,7 +287,7 @@ switch $cmd {
             set proc_ref [lindex [dict get $d elf] 1]
             set proc_elf [lindex [dict get $d elf] 2]
             if {[llength [get_files -all -of_objects [get_fileset sim_1] $proc_elf]] == 0} {
-                add_files -norecurse -fileset \[get_filesets sim_1\] $proc_elf
+                add_files -norecurse -fileset [get_filesets sim_1] $proc_elf
                 set_property SCOPED_TO_REF $proc_ref [get_files -all -of_objects [get_fileset sim_1] $proc_elf]
                 set_property SCOPED_TO_CELLS { $proc_inst } [get_files -all -of_objects [get_fileset sim_1] $proc_elf]
             }
