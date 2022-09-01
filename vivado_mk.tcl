@@ -82,7 +82,11 @@ switch $cmd {
         set d [params_to_dict $args]
         file mkdir $proj_dir
         cd ./$proj_dir
-        attempt "create_project -part $fpga_part -force $proj_name"
+        if {[string equal $fpga_part "none"]} {
+            attempt "create_project -force $proj_name"
+        } else {
+            attempt "create_project -part $fpga_part -force $proj_name"
+        }
         attempt "set_property target_language $proj_lang \[get_projects $proj_name\]"
         set_property -name "target_language" -value "VHDL" -objects [current_project]
         if {[dict exist $d dsn_vhdl]} {
