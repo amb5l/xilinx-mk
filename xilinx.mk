@@ -125,6 +125,11 @@ endef
 ################################################################################
 # basic checks
 
+ifneq (vivado,$(basename $(notdir $(word 1,$(shell which vivado 2>&1)))))
+$(info )
+$(error vivado executable not in path)
+endif
+
 ifndef VIVADO_PROJ
 $(error VIVADO_PROJ is not set)
 endif
@@ -217,6 +222,11 @@ endif
 # Vitis rules and recipes
 
 ifdef VITIS_APP
+
+ifneq (vitis,$(basename $(notdir $(word 1,$(shell which vitis 2>&1)))))
+$(info )
+$(error vitis executable not in path)
+endif
 
 # ELF files depend on XSA file and source (and existence of project)
 elf: $(VITIS_ELF_RELEASE) $(VITIS_ELF_DEBUG)
