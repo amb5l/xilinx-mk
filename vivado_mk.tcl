@@ -272,10 +272,11 @@ switch $cmd {
     }
 
     simulate {
-        # simulate [gen: generic value] [elf: proc_inst proc_ref proc_elf]
+        # simulate [gen: generic value] [elf: proc_inst proc_ref proc_elf] [vcd: filename]
         set d [params_to_dict $args]
         cd ./$proj_dir
         open_project $proj_name
+        attempt "set_property -name {xsim.simulate.runtime} -value {0ns} -objects \[get_filesets sim_1\]"
         if {[dict exist $d gen]} {
             set g [dict get $d gen]
             set s "set_property generic {"
@@ -297,9 +298,18 @@ switch $cmd {
             }
         }
         attempt "launch_simulation"
+        if {[dict exist $d vcd]} {
+            set vcd_filename [lindex [dict get $d vcd] 0]
+            attempt "open_vcd $vcd_filename"
+            attempt "log_vcd \[get_objects -r /*\]"
+        }
         set t_start [clock seconds]
         attempt "run all"
         set t_end [clock seconds]
+        if {[dict exist $d vcd]} {
+            attempt "flush_vcd"
+            attempt "close_vcd"
+        }
         set elapsed_time [expr {$t_end-$t_start}]
         puts "elapsed time == $elapsed_time"
     }
