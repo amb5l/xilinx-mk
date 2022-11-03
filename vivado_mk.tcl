@@ -26,7 +26,7 @@ proc error_exit {msgs} {
 
 proc attempt {cmd} {
     if {[catch {eval $cmd} msg]} {
-        error_exit $cmd $msg
+        error_exit {$cmd $msg}
     }
 }
 
@@ -157,7 +157,7 @@ switch $cmd {
             set d [dict remove $d sim_gen]
         }                
         if {[llength [dict keys $d]]} {
-            error_exit "create - leftovers: $d"
+            error_exit {"create - leftovers: $d"}
         }
     }
 
@@ -315,7 +315,7 @@ switch $cmd {
     }
 
     default {
-        error_exit "unknown command: $cmd"
+        error_exit {"unknown command: $cmd"}
     }
 
 }
