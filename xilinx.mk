@@ -207,7 +207,7 @@ $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_TCL,$(X:.tcl=_update
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_SVG,$(X:.tcl=_updated.svg),$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
 
 # run simulation
-sim: $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT)
+sim:: $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT)
 $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT): $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008) $(VIVADO_SIM_IP_FILES) $(VIVADO_SIM_ELF) $(VIVADO_SIM_IN) | $(VIVADO_PROJ_FILE)
 ifdef VITIS_APP
 	$(VIVADO_MK) simulate \
