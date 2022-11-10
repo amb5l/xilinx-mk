@@ -62,7 +62,7 @@ endif
 # Vivado variables
 
 # override this on the make command line
-VIVADO_JOBS=4
+VIVADO_JOBS?=4
 
 VIVADO_DIR=vivado
 VIVADO_MK=vivado -mode tcl -notrace -nolog -nojournal -source $(XILINX_MK)/vivado_mk.tcl -tclargs $(VIVADO_DIR) $(VIVADO_PROJ)
