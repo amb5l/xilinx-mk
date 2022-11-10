@@ -89,39 +89,6 @@ VIVADO_UPD_BD_SVG?=$(VIVADO_DSN_BD_TCL:.tcl=_updated.svg)
 VIVADO_SIM_IP_FILES?=$(foreach X,$(basename $(notdir $(VIVADO_DSN_IP_TCL))),$(addprefix $(VIVADO_SIM_IP_PATH)/,$(VIVADO_SIM_IP_$X)))
 
 ################################################################################
-# runtime rules
-
-# build IP core XCI files and simulation models from TCL scripts
-define RR_VIVADO_IP_XCI
-$(1) $(foreach X,$(VIVADO_SIM_IP_$(basename $(notdir $(2)))),$(VIVADO_SIM_IP_PATH)/$X) &: $(2) | $(VIVADO_PROJ_FILE)
-	$(VIVADO_MK) build ip ../$(1) $(2) $(foreach X,$(VIVADO_SIM_IP_$(basename $(notdir $(2)))),../$(VIVADO_SIM_IP_PATH)/$X)
-endef
-
-# build BD hardware definitions from BD files
-define RR_VIVADO_BD_HWDEF
-$(1): | $(2) $(VIVADO_PROJ_FILE)
-	$(VIVADO_MK) build hwdef ../$(2)
-endef
-
-# build BD files from BD TCL scripts
-define RR_VIVADO_BD
-$(1): $(2) | $(VIVADO_PROJ_FILE)
-	$(VIVADO_MK) build bd ../$(1) $(2)
-endef
-
-# build updated BD TCL scripts from BD files
-define RR_VIVADO_BD_TCL
-$(1): $(2)| $(VIVADO_PROJ_FILE)
-	$(VIVADO_MK) build bd_tcl $$@
-endef
-
-# build updated BD SVG files from BD files
-define RR_VIVADO_BD_SVG
-$(1): $(2) | $(VIVADO_PROJ_FILE)
-	$(VIVADO_MK) build bd_svg $$@
-endef
-
-################################################################################
 # basic checks
 
 ifneq (vivado,$(basename $(notdir $(word 1,$(shell which vivado 2>&1)))))
@@ -174,6 +141,10 @@ $(VIVADO_SYNTH_FILE): $(VIVADO_DSN_IP_XCI) $(VIVADO_DSN_BD_HWDEF) $(VIVADO_DSN_V
 	$(VIVADO_MK) build synth $(VIVADO_JOBS)
 
 # IP XCI files and simulation models depend on IP TCL scripts (and existence of project)
+define RR_VIVADO_IP_XCI
+$(1) $(foreach X,$(VIVADO_SIM_IP_$(basename $(notdir $(2)))),$(VIVADO_SIM_IP_PATH)/$X) &: $(2) | $(VIVADO_PROJ_FILE)
+	$(VIVADO_MK) build ip ../$(1) $(2) $(foreach X,$(VIVADO_SIM_IP_$(basename $(notdir $(2)))),../$(VIVADO_SIM_IP_PATH)/$X)
+endef
 $(foreach X,$(VIVADO_DSN_IP_TCL),$(eval $(call RR_VIVADO_IP_XCI,$(VIVADO_DSN_IP_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).xci,$X)))
 
 # hardware handoff (XSA) file depends on BD hwdef(s) (and existence of project)
@@ -181,9 +152,17 @@ $(VIVADO_XSA_FILE): $(VIVADO_DSN_BD_HWDEF) | $(VIVADO_PROJ_FILE)
 	$(VIVADO_MK) build xsa
 
 # BD hardware definitions depend on existence of BD files and project
+define RR_VIVADO_BD_HWDEF
+$(1): | $(2) $(VIVADO_PROJ_FILE)
+	$(VIVADO_MK) build hwdef ../$(2)
+endef
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_HWDEF,$(VIVADO_BD_HWDEF_PATH)/$(basename $(notdir $X))/synth/$(basename $(notdir $X)).hwdef,$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
 
 # BD files depend on BD TCL scripts (and existence of project)
+define RR_VIVADO_BD
+$(1): $(2) | $(VIVADO_PROJ_FILE)
+	$(VIVADO_MK) build bd ../$(1) $(2)
+endef
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD,$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd,$X)))
 
 # Vivado project file depends on makefile, and existence of all design and simulation sources
@@ -205,7 +184,16 @@ $(VIVADO_PROJ_FILE): makefile | $(VIVADO_DSN_IP_TCL) $(VIVADO_DSN_BD_TCL) $(VIVA
 # update BD source TCL scripts and SVG files from changed BD files
 .PHONY: update_bd
 update_bd: $(VIVADO_UPD_BD_TCL) $(VIVADO_UPD_BD_SVG)
+# build updated BD TCL scripts from BD files
+define RR_VIVADO_BD_TCL
+$(1): $(2)| $(VIVADO_PROJ_FILE)
+	$(VIVADO_MK) build bd_tcl $$@
+endef
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_TCL,$(X:.tcl=_updated.tcl),$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
+define RR_VIVADO_BD_SVG
+$(1): $(2) | $(VIVADO_PROJ_FILE)
+	$(VIVADO_MK) build bd_svg $$@
+endef
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_SVG,$(X:.tcl=_updated.svg),$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
 
 # run simulation
