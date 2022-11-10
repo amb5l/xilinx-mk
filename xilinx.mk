@@ -21,7 +21,7 @@
 #	VIVADO_DSN_ELF_CFG		build configuration for processor ELF file for implementation
 #
 # To include simulation support, define the following...
-#	VIVADO_SIM_TOP			top entity name for simulation
+#	VIVADO_SIM_TOP			top entity/configuration name for simulation
 #	VIVADO_SIM_OUT			simulation output file
 # ...and one or more of the following...
 #	VIVADO_SIM_VHDL			simulation sources - VHDL (.vhd)
@@ -44,7 +44,7 @@
 #	VITIS_SYMBOLS_RELEASE	symbols (Release configuration only)
 #	VITIS_SYMBOLS_DEBUG		symbols (Debug configuration only)
 #
-# to do: support synthesis and implementation strategies
+# TODO: support synthesis and implementation strategies
 ################################################################################
 # Vitis variables
 
