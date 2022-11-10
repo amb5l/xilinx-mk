@@ -129,11 +129,20 @@ $(VIVADO_BIT_FILE): $(VIVADO_IMPL_FILE)
 xpr: $(VIVADO_PROJ_FILE)
 
 # implementation file depends on synthesis file, ELF file, and relevant constraints (and existence of project)
+# we also carry out simulation prep here so that project is left ready for interactive simulation
 $(VIVADO_IMPL_FILE): $(VIVADO_SYNTH_FILE) $(VIVADO_DSN_ELF) $(VIVADO_DSN_XDC_IMPL) $(VIVADO_DSN_XDC) | $(VIVADO_PROJ_FILE)
 ifdef VITIS_APP
 	$(VIVADO_MK) build impl $(VIVADO_JOBS) $(VIVADO_DSN_PROC_INST) $(VIVADO_DSN_PROC_REF) ../$(VIVADO_DSN_ELF)
 else
 	$(VIVADO_MK) build impl $(VIVADO_JOBS)
+endif
+ifdef VITIS_APP
+	$(VIVADO_MK) simprep \
+		elf: $(VIVADO_DSN_PROC_INST) $(VIVADO_DSN_PROC_REF) ../$(VIVADO_SIM_ELF) \
+		gen: $(VIVADO_SIM_GENERICS)
+else
+	$(VIVADO_MK) simprep \
+		gen: $(VIVADO_SIM_GENERICS)
 endif
 
 # synthesis file depends design sources and relevant constraints (and existence of project)
