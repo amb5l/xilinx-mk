@@ -259,6 +259,34 @@ switch $cmd {
         }
     }
 
+    simprep {
+        # simprep [gen: generic value] [elf: proc_inst proc_ref proc_elf]
+        set d [params_to_dict $args]
+        cd ./$proj_dir
+        open_project $proj_name
+        attempt "set_property -name {xsim.simulate.runtime} -value {0ns} -objects \[get_filesets sim_1\]"
+        if {[dict exist $d gen]} {
+            set g [dict get $d gen]
+            set s "set_property generic {"
+            while {[llength $g] >= 2} {
+                append s "[lindex $g 0]=[lindex $g 1] "
+                set g [lrange $g 2 end]
+            }
+            append s "} \[get_filesets sim_1\]"
+            attempt $s
+        }
+        if {[dict exist $d elf]} {
+            set proc_inst [lindex [dict get $d elf] 0]
+            set proc_ref [lindex [dict get $d elf] 1]
+            set proc_elf [lindex [dict get $d elf] 2]
+            if {[llength [get_files -all -of_objects [get_fileset sim_1] $proc_elf]] == 0} {
+                add_files -norecurse -fileset [get_filesets sim_1] $proc_elf
+                set_property SCOPED_TO_REF $proc_ref [get_files -all -of_objects [get_fileset sim_1] $proc_elf]
+                set_property SCOPED_TO_CELLS { $proc_inst } [get_files -all -of_objects [get_fileset sim_1] $proc_elf]
+            }
+        }
+    }
+
     prog {
         # prog file
         set file [lindex $args 0]
