@@ -210,7 +210,7 @@ $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_SVG,$(X:.tcl=_update
 
 # run simulation
 .PHONY: sim
-sim:: $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT)
+sim:: $(addprefix $(VIVADO_SIM_PATH)/,$(VIVADO_SIM_OUT))
 $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT): $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008) $(VIVADO_SIM_IP_FILES) $(VIVADO_SIM_ELF) $(VIVADO_SIM_IN) | $(VIVADO_PROJ_FILE)
 ifdef VITIS_APP
 	$(VIVADO_MK) simulate \
