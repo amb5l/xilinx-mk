@@ -125,9 +125,6 @@ bit: $(VIVADO_BIT_FILE)
 $(VIVADO_BIT_FILE): $(VIVADO_IMPL_FILE)
 	$(VIVADO_MK) build bit ../$@
 
-# build project
-xpr: $(VIVADO_PROJ_FILE)
-
 # implementation file depends on synthesis file, ELF file, and relevant constraints (and existence of project)
 # we also carry out simulation prep here so that project is left ready for interactive simulation
 $(VIVADO_IMPL_FILE): $(VIVADO_SYNTH_FILE) $(VIVADO_DSN_ELF) $(VIVADO_DSN_XDC_IMPL) $(VIVADO_DSN_XDC) | $(VIVADO_PROJ_FILE)
