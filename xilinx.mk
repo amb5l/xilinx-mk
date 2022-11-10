@@ -50,44 +50,43 @@
 
 ifdef VITIS_APP
 
-VITIS_DIR=vitis
-VITIS_MK=xsct $(XILINX_MK)/vitis_mk.tcl $(VITIS_DIR) $(VITIS_APP)
-VITIS_PROJ_FILE=$(VITIS_DIR)/$(VITIS_APP)/$(VITIS_APP).prj
-VITIS_ELF_RELEASE=$(VITIS_DIR)/$(VITIS_APP)/Release/$(VITIS_APP).elf
-VITIS_ELF_DEBUG=$(VITIS_DIR)/$(VITIS_APP)/Debug/$(VITIS_APP).elf
+VITIS_DIR?=vitis
+VITIS_MK?=xsct $(XILINX_MK)/vitis_mk.tcl $(VITIS_DIR) $(VITIS_APP)
+VITIS_PROJ_FILE?=$(VITIS_DIR)/$(VITIS_APP)/$(VITIS_APP).prj
+VITIS_ELF_RELEASE?=$(VITIS_DIR)/$(VITIS_APP)/Release/$(VITIS_APP).elf
+VITIS_ELF_DEBUG?=$(VITIS_DIR)/$(VITIS_APP)/Debug/$(VITIS_APP).elf
 
 endif
 
 ################################################################################
 # Vivado variables
 
-# override this on the make command line
 VIVADO_JOBS?=4
 
-VIVADO_DIR=vivado
-VIVADO_MK=vivado -mode tcl -notrace -nolog -nojournal -source $(XILINX_MK)/vivado_mk.tcl -tclargs $(VIVADO_DIR) $(VIVADO_PROJ)
-VIVADO_PROJ_FILE=$(VIVADO_DIR)/$(VIVADO_PROJ).xpr
-VIVADO_BIT_FILE=$(VIVADO_DSN_TOP).bit
-VIVADO_IMPL_FILE=$(VIVADO_DIR)/$(VIVADO_PROJ).runs/impl_1/$(VIVADO_DSN_TOP)_routed.dcp
-VIVADO_SYNTH_FILE=$(VIVADO_DIR)/$(VIVADO_PROJ).runs/synth_1/$(VIVADO_DSN_TOP).dcp
-VIVADO_XSA_FILE=$(VIVADO_DIR)/$(VIVADO_DSN_TOP).xsa
-VIVADO_DSN_IP_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).srcs/sources_1/ip
-VIVADO_BD_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).srcs/sources_1/bd
-VIVADO_BD_HWDEF_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).gen/sources_1/bd
-VIVADO_SIM_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).sim/sim_1/behav/xsim
-VIVADO_SIM_IP_PATH=$(VIVADO_DIR)/$(VIVADO_PROJ).gen/sources_1/ip
+VIVADO_DIR?=vivado
+VIVADO_MK?=vivado -mode tcl -notrace -nolog -nojournal -source $(XILINX_MK)/vivado_mk.tcl -tclargs $(VIVADO_DIR) $(VIVADO_PROJ)
+VIVADO_PROJ_FILE?=$(VIVADO_DIR)/$(VIVADO_PROJ).xpr
+VIVADO_BIT_FILE?=$(VIVADO_DSN_TOP).bit
+VIVADO_IMPL_FILE?=$(VIVADO_DIR)/$(VIVADO_PROJ).runs/impl_1/$(VIVADO_DSN_TOP)_routed.dcp
+VIVADO_SYNTH_FILE?=$(VIVADO_DIR)/$(VIVADO_PROJ).runs/synth_1/$(VIVADO_DSN_TOP).dcp
+VIVADO_XSA_FILE?=$(VIVADO_DIR)/$(VIVADO_DSN_TOP).xsa
+VIVADO_DSN_IP_PATH?=$(VIVADO_DIR)/$(VIVADO_PROJ).srcs/sources_1/ip
+VIVADO_BD_PATH?=$(VIVADO_DIR)/$(VIVADO_PROJ).srcs/sources_1/bd
+VIVADO_BD_HWDEF_PATH?=$(VIVADO_DIR)/$(VIVADO_PROJ).gen/sources_1/bd
+VIVADO_SIM_PATH?=$(VIVADO_DIR)/$(VIVADO_PROJ).sim/sim_1/behav/xsim
+VIVADO_SIM_IP_PATH?=$(VIVADO_DIR)/$(VIVADO_PROJ).gen/sources_1/ip
 ifdef VITIS_APP
-VIVADO_DSN_ELF=$(VITIS_DIR)/$(VITIS_APP)/$(VIVADO_DSN_ELF_CFG)/$(VITIS_APP).elf
-VIVADO_SIM_ELF=$(VITIS_DIR)/$(VITIS_APP)/$(VIVADO_SIM_ELF_CFG)/$(VITIS_APP).elf
+VIVADO_DSN_ELF?=$(VITIS_DIR)/$(VITIS_APP)/$(VIVADO_DSN_ELF_CFG)/$(VITIS_APP).elf
+VIVADO_SIM_ELF?=$(VITIS_DIR)/$(VITIS_APP)/$(VIVADO_SIM_ELF_CFG)/$(VITIS_APP).elf
 endif
 
 # related file lists
-VIVADO_DSN_IP_XCI=$(foreach X,$(basename $(notdir $(VIVADO_DSN_IP_TCL))),$(VIVADO_DSN_IP_PATH)/$X/$X.xci)
-VIVADO_DSN_BD=$(foreach X,$(basename $(notdir $(VIVADO_DSN_BD_TCL))),$(VIVADO_BD_PATH)/$X/$X.bd)
-VIVADO_DSN_BD_HWDEF=$(foreach X,$(basename $(notdir $(VIVADO_DSN_BD_TCL))),$(VIVADO_BD_HWDEF_PATH)/$X/synth/$X.hwdef)
-VIVADO_UPD_BD_TCL=$(VIVADO_DSN_BD_TCL:.tcl=_updated.tcl)
-VIVADO_UPD_BD_SVG=$(VIVADO_DSN_BD_TCL:.tcl=_updated.svg)
-VIVADO_SIM_IP_FILES=$(foreach X,$(basename $(notdir $(VIVADO_DSN_IP_TCL))),$(addprefix $(VIVADO_SIM_IP_PATH)/,$(VIVADO_SIM_IP_$X)))
+VIVADO_DSN_IP_XCI?=$(foreach X,$(basename $(notdir $(VIVADO_DSN_IP_TCL))),$(VIVADO_DSN_IP_PATH)/$X/$X.xci)
+VIVADO_DSN_BD?=$(foreach X,$(basename $(notdir $(VIVADO_DSN_BD_TCL))),$(VIVADO_BD_PATH)/$X/$X.bd)
+VIVADO_DSN_BD_HWDEF?=$(foreach X,$(basename $(notdir $(VIVADO_DSN_BD_TCL))),$(VIVADO_BD_HWDEF_PATH)/$X/synth/$X.hwdef)
+VIVADO_UPD_BD_TCL?=$(VIVADO_DSN_BD_TCL:.tcl=_updated.tcl)
+VIVADO_UPD_BD_SVG?=$(VIVADO_DSN_BD_TCL:.tcl=_updated.svg)
+VIVADO_SIM_IP_FILES?=$(foreach X,$(basename $(notdir $(VIVADO_DSN_IP_TCL))),$(addprefix $(VIVADO_SIM_IP_PATH)/,$(VIVADO_SIM_IP_$X)))
 
 ################################################################################
 # runtime rules
