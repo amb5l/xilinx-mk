@@ -26,7 +26,7 @@ proc error_exit {msgs} {
 
 proc attempt {cmd} {
     if {[catch {eval $cmd} msg]} {
-        error_exit {$cmd $msg}
+        error_exit [list $cmd $msg]
     }
 }
 
