@@ -148,10 +148,12 @@ endif
 # Vivado rules and recipes
 
 # program FPGA
+.PHONY: prog
 prog: $(VIVADO_BIT_FILE)
 	$(VIVADO_MK) prog $<
 
 # bit file depends on implementation file
+.PHONY: bit
 bit: $(VIVADO_BIT_FILE)
 $(VIVADO_BIT_FILE): $(VIVADO_IMPL_FILE)
 	$(VIVADO_MK) build bit ../$@
@@ -201,11 +203,13 @@ $(VIVADO_PROJ_FILE): makefile | $(VIVADO_DSN_IP_TCL) $(VIVADO_DSN_BD_TCL) $(VIVA
 		sim_gen:        $(VIVADO_SIM_GENERICS)
 
 # update BD source TCL scripts and SVG files from changed BD files
+.PHONY: update_bd
 update_bd: $(VIVADO_UPD_BD_TCL) $(VIVADO_UPD_BD_SVG)
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_TCL,$(X:.tcl=_updated.tcl),$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
 $(foreach X,$(VIVADO_DSN_BD_TCL),$(eval $(call RR_VIVADO_BD_SVG,$(X:.tcl=_updated.svg),$(VIVADO_BD_PATH)/$(basename $(notdir $X))/$(basename $(notdir $X)).bd)))
 
 # run simulation
+.PHONY: sim
 sim:: $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT)
 $(VIVADO_SIM_PATH)/$(VIVADO_SIM_OUT): $(VIVADO_SIM_VHDL) $(VIVADO_SIM_VHDL_2008) $(VIVADO_SIM_IP_FILES) $(VIVADO_SIM_ELF) $(VIVADO_SIM_IN) | $(VIVADO_PROJ_FILE)
 ifdef VITIS_APP
@@ -228,6 +232,7 @@ $(error vitis executable not in path)
 endif
 
 # ELF files depend on XSA file and source (and existence of project)
+.PHONY: elf
 elf: $(VITIS_ELF_RELEASE) $(VITIS_ELF_DEBUG)
 $(VITIS_ELF_RELEASE) : $(VIVADO_XSA_FILE) $(VITIS_SRC) $(VITIS_SRC_RELEASE) | $(VITIS_PROJ_FILE)
 	$(VITIS_MK) build release
@@ -250,6 +255,7 @@ endif
 ################################################################################
 # clean up
 
+.PHONY: clean
 clean::
 	rm -rf .Xil
 	rm -rf $(VIVADO_DIR)
